@@ -41,6 +41,8 @@ services:
   web:
     build: ./web
     restart: unless-stopped
+    environment:
+      BACKEND_UPSTREAM: backend
     ports:
       - "80:80"
     depends_on:

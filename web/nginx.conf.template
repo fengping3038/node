@@ -14,9 +14,12 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # API 反向代理到后端（docker-compose 内的服务名 backend）
+    # API 反向代理到后端
+    # ${BACKEND_UPSTREAM} 由容器启动时替换：
+    #   - 本地/ Railway（compose）：backend
+    #   - Zeabur：后端服务的内网地址，如 <服务名>.zeabur.internal
     location /api/ {
-        proxy_pass http://backend:3000;
+        proxy_pass http://${BACKEND_UPSTREAM}:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -25,7 +28,7 @@ server {
 
     # 上传的头像等静态资源
     location /uploads/ {
-        proxy_pass http://backend:3000;
+        proxy_pass http://${BACKEND_UPSTREAM}:3000;
         proxy_set_header Host $host;
     }
 }
