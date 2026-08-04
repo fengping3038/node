@@ -270,8 +270,8 @@ const uploadAvatar = async (ctx) => {
     }
     
     // 头像文件已由 koa-body 保存到 uploads 目录，这里返回可访问的URL
-    // newFilename 是保存到磁盘的实际文件名（保留扩展名）
-    const avatarUrl = `http://localhost:3000/uploads/${file.newFilename || file.name}`;
+    // 使用相对路径：生产环境由 Nginx 反代 /uploads/ 到后端，各环境通用
+    const avatarUrl = `/uploads/${file.newFilename || file.name}`;
     
     // 更新数据库中的头像字段
     const user = await User.findByPk(userId);

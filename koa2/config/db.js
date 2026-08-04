@@ -11,6 +11,11 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     timezone: '+08:00',
     logging: false, // 生产环境关闭日志
+    // TiDB Cloud Serverless 强制 TLS；设置 DB_SSL=true 启用（本地 MySQL 无需）
+    dialectOptions:
+      process.env.DB_SSL === 'true'
+        ? { ssl: { rejectUnauthorized: false } }
+        : {},
     pool: {
       max: 5,
       min: 0,

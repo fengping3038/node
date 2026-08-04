@@ -77,8 +77,13 @@ const startServer = async () => {
     await testConnection();
 
     // 设置SQL模式以允许零日期值（解决MySQL严格模式问题）
-    await sequelize.query("SET SESSION sql_mode = 'NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
-    console.log('✅ SQL模式已更新');
+    // 部分托管库（如 TiDB）对个别模式值不兼容，这里做成容错，失败仅告警不退出
+    try {
+      await sequelize.query("SET SESSION sql_mode = 'NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
+      console.log('✅ SQL模式已更新');
+    } catch (sqlModeErr) {
+      console.warn('⚠️ 设置SQL模式失败（不影响启动）:', sqlModeErr.message);
+    }
 
     // 同步数据库模型（开发环境使用，生产环境建议使用迁移）
     await sequelize.sync({ alter: true });
